@@ -18,16 +18,18 @@ public class Man {
     public Date birthDate;
     private Man bestFriend;
     
-    static int classID = 3;
+    static int classID = 3;      //пример статического поля
     
     //Конструктор класса без параметров
     public Man() {               //если новому инстансу явно не указали значения полей, то он установит их сам
+        System.out.println("Вызван человечий конструктор ^_^");
         this.surname = "Snow";
         this.homeland = "North";
     }
     
     //Конструктор с параметрами
     public Man(String surname, String homeland, Date birthdate) {   //новый инстанс класса создается с явно заданными значениями полей
+        System.out.println("Вызван умный человечий конструктор ^_^");
         this.surname = surname;
         this.homeland = homeland;
         this.birthDate = birthdate;

@@ -9,7 +9,6 @@ package javaintroduction;
  * @author smith
  */
 public interface Army {
-    
     void protectPeople(Man man);
     void hateStudent(Student student);
 }
