@@ -1,0 +1,366 @@
+package com.company;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        File file = new File("database.txt");
+        ArrayList<Line> arrayList = new ArrayList<Line>();
+
+        try {//пробуем открыть существующий файл и построчно считать его содержимое
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("database.txt")));
+            try {
+                while (reader.ready()) {
+                    String str = reader.readLine();
+                    arrayList.add(new Line(str));
+
+                }
+            } catch (IOException e1) {
+                System.out.print("Something is wrong");
+            }
+        } catch (FileNotFoundException e) {//если файл не найден, создаём его и записываем в него строку, введённую пользовател
+            System.out.println("Файл не найден\n" + "Введите данные");
+
+            Scanner sca = new Scanner(System.in);//пользователь вводит строку
+            String data = sca.nextLine();
+            arrayList.add(new Line(data));
+
+            FileWriter writeFile = null; //строка записывается в файл
+            try {
+                writeFile = new FileWriter(file);
+                writeFile.write(data);
+            } catch (IOException e1) {
+                e.printStackTrace();
+            } finally {
+                if (writeFile != null) {
+                    try {
+                        writeFile.close();
+                    } catch (IOException e1) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }
+
+        boolean action = true;
+        System.out.println("Добро пожаловать!\n");
+
+        while (action) {
+            System.out.println("Для продолжения работы выберите одну из опций\n" + "1:Вывести все данные\n" + "2:Добавить данные в файл");
+            System.out.println("3:Вывести данные о счёте по его номеру\n" + "4:Получить данные обо всех счетах с одинаковым именем\n" + "5:Удалить данные об одном из счетов по его номеру");
+            System.out.println("6:Удалить данные обо всех счетах с одинаковым именем\n" + "7:отсортировать данные\n8:Заменить данные о каком-либо из счетов");
+
+            Scanner scanner = new Scanner(System.in);
+            int select = scanner.nextInt();
+
+            switch (select) {
+                case 1: {
+                    for (int i = 0; i < arrayList.size(); i++) {
+                        arrayList.get(i).printLine();
+                    }
+                }
+                break;
+
+                case 2: {
+                    boolean correct = true;
+                    String name = new String();
+                    int sum = 0, number = 0;
+                    System.out.println("Введите данные, которые вы хотели бы добавить");
+                    System.out.println("Введите имя");
+
+
+                    while (correct) {
+                        Scanner sc = new Scanner(System.in);
+                        name = sc.nextLine();
+                        if (name.length() == 0) System.out.println("Имя не может быть пустым. Введите ещё раз");
+                        else correct = false;
+                    }
+                    correct = true;
+                    System.out.println("Введите номер счёта");
+
+                    while (correct) {
+                        Scanner sc = new Scanner(System.in);
+                        number = sc.nextInt();
+                        if (number <= 0) System.out.println("Номер счёта строго больше нуля!. Введите ещё раз");
+                        else
+                            for (int i = 0; i < arrayList.size(); i++)
+                                if (arrayList.get(i).accountNumber == number) {
+                                    System.out.println("Счёт с таким номером уже существует.");
+                                    System.out.println("Введите другой номер");
+                                    Scanner sc1 = new Scanner(System.in);
+                                    String str = sc1.nextLine();
+                                    if (str == "") {
+                                    } else correct = false;
+                                } else correct = false;
+                    }
+                    correct = true;
+                    System.out.println("Введите остаток на счётк");
+
+                    while (correct) {
+                        Scanner sc = new Scanner(System.in);
+                        sum = sc.nextInt();
+                        if (sum < 0)
+                            System.out.println("Остаток на счёте не может быть отрицательным. Введите ещё раз");
+                        else correct = false;
+                    }
+
+
+                    name = name + "_" + Integer.toString(number) + "_" + Integer.toString(sum);
+                    arrayList.add(new Line(name));
+
+                    System.out.println("Данные успешно добавлены");
+
+                    break;
+                }
+
+                case 3: {
+                    System.out.println("Введите номер счёта");
+                    Scanner scan1 = new Scanner(System.in);
+                    boolean flag = false;
+                    int id = scan1.nextInt();
+                    for (int i = 0; i < arrayList.size(); i++) {
+                        Line logLine = arrayList.get(i);
+                        if (logLine.accountNumber == id) {
+                            logLine.printByNumber();
+                            flag = true;
+                        }
+                    }
+                    if (flag == false) System.out.println("Cчёта с таким номером не существует");
+                }
+                break;
+
+                case 4: {
+                    System.out.println("Введите имя клиента");
+                    Scanner scan1 = new Scanner(System.in);
+                    String client = scan1.nextLine();
+                    boolean flag = false;
+                    for (int i = 0; i < arrayList.size(); i++) {
+                        Line logLine = arrayList.get(i);
+                        if (logLine.name.equals(client)) {
+                            logLine.printByName();
+                            flag = true;
+                        }
+                    }
+                    if (flag == false) System.out.println("Клиента с таким именем не существует");
+                }
+                break;
+
+                case 5: { System.out.println("Введите номер счёта");
+                    Scanner scan1 = new Scanner(System.in);
+                    int num = scan1.nextInt();
+                    boolean flag = false;
+                    boolean bool=false;
+
+                    for (int i = 0; i < arrayList.size(); i++) {
+                        if (bool) i--;
+                        bool=false;
+                        Line logLine = arrayList.get(i);
+
+
+                        if (logLine.accountNumber==num) { //если строка "та самая", то удаляем её из arrayList'а. и всё.
+                            arrayList.remove(i);
+                            bool=true;
+                            flag = true;
+                        }
+                    }
+                    if (flag == false) System.out.println("Cчёта с таким номером не существует");
+                    else System.out.println("Данные счете успешно удалены");
+
+                }
+                break;
+
+                case 6: {
+                    System.out.println("Введите имя");
+                    Scanner scan1 = new Scanner(System.in);
+                    String str = scan1.nextLine();
+                    boolean flag = false;
+                    boolean bool = false;
+
+                    for (int i = 0; i < arrayList.size(); i++) {
+                        if (bool) i--;
+                        bool = false;
+                        Line logLine = arrayList.get(i);
+
+                        if (logLine.name.equals(str)) { //если строка "та самая", то удаляем её из arrayList'а. и всё.
+                            arrayList.remove(i);
+                            bool = true;
+                            flag = true;
+                        }
+                    }
+
+                    if (flag == false) System.out.println("У этого клиента нет счетов");
+                    else System.out.println("Данные о всех счетах успешно удалены");
+
+                    break;
+                }
+
+                case 7: {
+                    System.out.println("Отсортировать по...\n1:Сумме(по убыванию)\n2:Сумме(по возрастанию)\n3:Номеру счёта(по убыванию)\n4:Номеру счёта(по возрастанию)\n");
+                    Scanner scan1 = new Scanner(System.in);
+                    int choise = scan1.nextInt();
+
+                    switch (choise) {
+                        case 1: {
+                            Line helpLine=new Line();
+                            for (int i = 0; i <arrayList.size(); i++)
+                                for (int j=0; j<arrayList.size(); j++)
+                                if (arrayList.get(i).sum > arrayList.get(j).sum) {
+                                    helpLine=arrayList.get(i);
+                                    arrayList.set(i, arrayList.get(j));
+                                    arrayList.set(j,helpLine);
+
+                                }
+                            }
+
+
+                            break;
+
+                        case 2: {
+                            Line helpLine=new Line();
+                            for (int i = 0; i <arrayList.size(); i++)
+                                for (int j=0; j<arrayList.size(); j++)
+                                    if (arrayList.get(i).sum < arrayList.get(j).sum) {
+                                        helpLine=arrayList.get(i);
+                                        arrayList.set(i, arrayList.get(j));
+                                        arrayList.set(j,helpLine);
+
+                                    }
+                        }
+                            break;
+
+                        case 3: {
+                            Line helpLine=new Line();
+                            for (int i = 0; i <arrayList.size(); i++)
+                                for (int j=0; j<arrayList.size(); j++)
+                                    if (arrayList.get(i).accountNumber > arrayList.get(j).accountNumber) {
+                                        helpLine=arrayList.get(i);
+                                        arrayList.set(i, arrayList.get(j));
+                                        arrayList.set(j,helpLine);
+
+                                    }
+                        }
+                            break;
+                        case 4: {
+                            Line helpLine=new Line();
+                            for (int i = 0; i <arrayList.size(); i++)
+                                for (int j=0; j<arrayList.size(); j++)
+                                    if (arrayList.get(i).accountNumber < arrayList.get(j).accountNumber) {
+                                        helpLine=arrayList.get(i);
+                                        arrayList.set(i, arrayList.get(j));
+                                        arrayList.set(j,helpLine);
+
+                                    }
+                        }
+                            break;
+
+
+                    }
+                    System.out.println("Cортировка выполнена успешно");
+                    break;
+                }
+
+                case 8: {
+                    System.out.println("Введите номер счёта, данные о котором вы хотели бы заменить");
+                    Scanner scan1 = new Scanner(System.in);
+                    int t = scan1.nextInt();
+                    boolean exists=false;
+                    boolean correctsum=true;
+                    int sum=0;
+
+                    for(int i=0; i<arrayList.size(); i++)
+                    {
+                        if (arrayList.get(i).accountNumber==t)
+                            exists=true;
+                    }
+
+                    if(exists=false) System.out.println("Счёта с таким номером не существует");
+                    else {
+                        System.out.println("Введите новые данные");
+                        System.out.println("Имя:");
+                        Scanner sc=new Scanner(System.in);
+                        String name=sc.nextLine();
+
+                        while(correctsum)
+                        { System.out.println("Остаток на счёте:");
+                        sum=sc.nextInt();
+                            if(sum<0) System.out.println("Остаток не может быть отрицательным. Введите ещё раз");
+                        else correctsum=false;}
+
+                        if (name=="")
+                        {
+                            for(int i=0; i<arrayList.size(); i++)
+                            {
+                                if (arrayList.get(i).accountNumber==t)
+                                   name=arrayList.get(i).name;
+                            }
+                        }
+
+                        name=name+"_"+Integer.toString(t)+"_"+Integer.toString(sum);
+                        for(int i=0; i<arrayList.size(); i++)
+                        {
+                            if (arrayList.get(i).accountNumber==t)
+                                arrayList.set(i, new Line(name));
+                        }
+                    }
+
+                }
+
+            }
+
+
+            FileWriter writeFile = null; //строка записывается в файл
+            try {
+                writeFile = new FileWriter(file);
+                writeFile.write(arrayList.get(0).name + "_" + Integer.toString(arrayList.get(0).accountNumber) + "_" + Integer.toString(arrayList.get(0).sum)+"\r\n");
+                writeFile.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (writeFile != null) {
+                    try {
+                        writeFile.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+
+
+            for(int i=1; i<arrayList.size();i++)
+            {
+
+                String name = arrayList.get(i).name + "_" + Integer.toString(arrayList.get(i).accountNumber) + "_" + Integer.toString(arrayList.get(i).sum)+ "\r\n";
+               // FileWriter writeFile = null; //строка записывается в файл
+                try {
+                    writeFile = new FileWriter(file, true);
+                    writeFile.append(name);
+                    writeFile.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (writeFile != null) {
+                        try {
+                            writeFile.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+            }
+
+            System.out.println("1: Работать дальше");
+            System.out.println("2: Завершение работы");
+
+            if(scanner.nextInt()==2) action=false;
+
+        }
+    }
+}
